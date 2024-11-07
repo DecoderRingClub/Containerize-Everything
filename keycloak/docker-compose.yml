@@ -1,0 +1,68 @@
+# Mark L. 'Put everything in a box'
+
+version: '3.6'
+
+services:
+  keycloak_web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: keycloak
+    env_file: .env
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloakdb:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER} # Ensure a .env is create and these variables are properly referenced.
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD} # Ensure a .env is create and these variables are properly referenced.
+    restart: always
+    command: start-dev # In a production deployment ensure this is changed to 'start' and not 'start-dev'
+    depends_on:
+      - keycloakdb
+    ports:
+      - 8080:8080
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "http://localhost:8080/realms/master"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 30s
+
+  keycloakdb:
+    image: postgres:15
+    container_name: keycloakdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD} # Ensure a .env is create and these variables are properly referenced.
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "keycloak"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 30s
+
+volumes:
+  postgres_data:
