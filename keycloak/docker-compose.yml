@@ -1,12 +1,13 @@
 # Pro ready deployment (with TLS). Mark L.
 # Everything in a box.
 # 
-# For the secrets, running the following before deploying
+# For the secrets, run the following before deploying
 # mkdir -p secrets
 # echo "your-secure-db-password" > secrets/db_password.txt
 # echo "admin" > secrets/admin_user.txt
 # echo "your-secure-admin-password" > secrets/admin_password.txt
 # chmod 600 secrets/*
+# echo KC_HOSTNAME_VAR="whatever-hostname" > .env
 
 services:
   keycloak_web:
@@ -19,7 +20,6 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloakdb:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD_FILE: /run/secrets/db_password
-      # You'll need to create a .env file that contains the reference here, but easy to do.
       KC_HOSTNAME: ${KC_HOSTNAME_VAR}
       KC_HOSTNAME_STRICT: true
       KC_HOSTNAME_STRICT_HTTPS: true
