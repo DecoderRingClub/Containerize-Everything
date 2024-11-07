@@ -1,5 +1,12 @@
 # Pro ready deployment (with TLS). Mark L.
 # Everything in a box.
+# 
+# For the secrets, running the following before deploying
+# mkdir -p secrets
+# echo "your-secure-db-password" > secrets/db_password.txt
+# echo "admin" > secrets/admin_user.txt
+# echo "your-secure-admin-password" > secrets/admin_password.txt
+# chmod 600 secrets/*
 
 services:
   keycloak_web:
