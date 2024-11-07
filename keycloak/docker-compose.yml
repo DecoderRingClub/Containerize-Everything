@@ -1,4 +1,4 @@
-# Pro ready deployment. Mark L.
+# Pro ready deployment (with TLS). Mark L.
 # Everything in a box.
 
 services:
@@ -12,7 +12,8 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloakdb:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD_FILE: /run/secrets/db_password
-      KC_HOSTNAME: ${KC_HOSTNAME_VAR} # You'll need to create a .env file that contains the reference here, but easy to do.
+      # You'll need to create a .env file that contains the reference here, but easy to do.
+      KC_HOSTNAME: ${KC_HOSTNAME_VAR}
       KC_HOSTNAME_STRICT: true
       KC_HOSTNAME_STRICT_HTTPS: true
       KC_HTTP_ENABLED: false
@@ -27,7 +28,8 @@ services:
       KEYCLOAK_ADMIN_FILE: /run/secrets/admin_user
       KEYCLOAK_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
     volumes:
-      - ./certs:/opt/keycloak/conf/certs:ro # You'll want to bind this to your actual path on your host.
+      # You'll want to bind this to your actual path on your host.
+      - ./certs:/opt/keycloak/conf/certs:ro
     secrets:
       - db_password
       - admin_user
@@ -44,6 +46,7 @@ services:
       retries: 3
       start_period: 60s
   keycloakdb:
+    # You can change the Postgres image to simply 15, but locking it to 15.2 ensures compatibility and stability. Dealers choice.
     image: postgres:15.2
     container_name: keycloakdb
     volumes:
