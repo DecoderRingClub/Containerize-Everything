@@ -16,12 +16,15 @@ services:
   keycloak_web:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
+    ports:
+    # Since this is behind Nginx on the host, we are strictly locking down the route to pass from Nginx to Keycloak
+      - "127.0.0.1:8443:8443"    
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloakdb:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD_FILE: /run/secrets/db_password
-      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME: ${KC_HOSTNAME_VAR}
       KC_HOSTNAME_STRICT: true
       KC_HOSTNAME_STRICT_HTTPS: true
       KC_HTTP_ENABLED: false
@@ -30,14 +33,12 @@ services:
       KC_PROXY: edge
       KC_TRANSACTION_XA_ENABLED: false
       KC_HTTP_RELATIVE_PATH: /auth
+      KC_SPI_EVENTS_LISTENER_EMAIL_EXCLUDE_EVENTS: "LOGIN, LOGOUT"
       KC_LOG_LEVEL: WARN
       KC_METRICS_ENABLED: true
       KC_HEALTH_ENABLED: true
       KEYCLOAK_ADMIN_FILE: /run/secrets/admin_user
       KEYCLOAK_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
-    ports:
-    # Since this is behind Nginx on the host, we are strictly locking down the route to pass from Nginx to Keycloak
-      - "127.0.0.1:8443:8443"
     volumes:
     # You'll want to bind this to your actual path on your host.
       - /etc/ssl/certs:/etc/ssl/certs:ro
@@ -57,7 +58,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-
+      
   keycloakdb:
   # You can change the Postgres image to simply 15, but locking it to 15.2 ensures compatibility and stability. Dealers choice.
     image: postgres:15.2
