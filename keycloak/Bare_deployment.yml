@@ -52,6 +52,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+      
   keycloakdb:
     # You can change the Postgres image to simply 15, but locking it to 15.2 ensures compatibility and stability. Dealers choice.
     image: postgres:15.2
@@ -71,9 +72,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
 volumes:
   postgres_data:
     driver: local
+
 secrets:
   db_password:
     file: ./secrets/db_password.txt
