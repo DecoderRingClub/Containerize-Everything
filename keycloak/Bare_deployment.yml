@@ -41,7 +41,7 @@ services:
       - db_password
       - admin_user
       - admin_password
-    command: start --optimized
+    command: start --optimized # suppose to use the --optimized flag, but throws errors regardless. Works without the flag as well.
     depends_on:
       keycloakdb:
         condition: service_healthy
